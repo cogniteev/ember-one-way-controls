@@ -2,7 +2,8 @@ import Ember from 'ember';
 
 const {
   Component,
-  get
+  get,
+  run
 } = Ember;
 
 export default Component.extend({
@@ -11,6 +12,7 @@ export default Component.extend({
   attributeBindings: [
     'accept',
     'autocomplete',
+    'autofocus',
     'autosave',
     'checked',
     'dir',
@@ -95,5 +97,12 @@ export default Component.extend({
   didReceiveAttrs() {
     this._super(...arguments);
     this._processNewValue.call(this, 'update', get(this, 'value') || get(this, 'checked'));
+  },
+
+  didInsertElement() {
+    this._super(...arguments);
+    if (get(this, 'autofocus')) {
+      run.scheduleOnce('afterRender', this, () => this.$().focus());
+    }
   }
 });
