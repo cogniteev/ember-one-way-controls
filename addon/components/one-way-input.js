@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import { invokeAction } from 'ember-invoke-action';
 
 const {
   Component,
@@ -35,6 +36,7 @@ const OneWayInputComponent = Component.extend({
     'name',
     'pattern',
     'placeholder',
+    'required',
     'size',
     'step',
     'type',
@@ -73,13 +75,11 @@ const OneWayInputComponent = Component.extend({
 
   _processNewValue(methodName, rawValue) {
     let value = this.sanitizeInput(rawValue);
-    let action = this.attrs[methodName];
 
     if (this._sanitizedValue !== value) {
       this._sanitizedValue = value;
-      if (action) {
-        action(value);
-      }
+
+      invokeAction(this, methodName, value);
     }
   },
 

@@ -36,6 +36,29 @@ test('Selecting a value updates the selected value', function(assert) {
   assert.equal(this.get('value'), 'male', 'Value is \'male\'');
 });
 
+test('Selecting a value updates the selected value for pre-grouped options', function(assert) {
+  const groups = [
+    {
+      groupName: 'group1',
+      options: [ 'value1' ]
+    }, {
+      groupName: 'group2',
+      options: [ 'value2' ]
+    }
+  ];
+
+  this.set('options', groups);
+  this.on('update', (value) => this.set('value', value));
+
+  this.render(hbs`{{one-way-select value=value options=options update=(action 'update')}}`);
+
+  this.$('select').val('value2');
+  this.$('select').trigger('change');
+
+  assert.equal(this.$('option:selected').val(), 'value2', 'value2 is selected');
+  assert.equal(this.get('value'), 'value2', 'Value is \'value2\'');
+});
+
 test('Accepts a space seperated string for options', function(assert) {
   this.render(hbs`{{one-way-select value=value options="male female"}}`);
   assert.equal(this.$('option').length, 2, 'There are two options: male, female');
@@ -187,4 +210,14 @@ test('multiple select a value', function(assert) {
 
   assert.equal(this.$('option:selected:eq(0)').val(), 1, 'Dubbel is selected');
   assert.deepEqual(this.get('value'), [dubbel, ipa, saison], 'Dubbel, IPA and Saison are selected');
+});
+
+test('It handles the old style of actions', function(assert) {
+  assert.expect(1);
+  let fired = false;
+  this.on('update', () => fired = true);
+  this.render(hbs`{{one-way-select value=value options=options update='update'}}`);
+  this.$('select').val('male');
+  this.$('select').trigger('change');
+  assert.equal(fired, true, 'The update action should have fired');
 });

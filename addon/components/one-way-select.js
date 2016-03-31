@@ -129,14 +129,20 @@ const OneWaySelectComponent = Component.extend({
   _findOption(value) {
     let options = get(this, 'options');
     let optionValuePath = get(this, 'optionValuePath');
+    let optionsArePreGrouped = get(this, 'optionsArePreGrouped');
 
-    return options.find((item) => {
+    let findOption = (item) => {
       if (optionValuePath) {
         return `${get(item, optionValuePath)}` === value;
       } else {
         return `${item}` === value;
       }
-    });
+    };
+
+    if (optionsArePreGrouped) {
+      return options.reduce((acc, group) => acc.concat(get(group, 'options')), []).find(findOption);
+    }
+    return options.find(findOption);
   },
 });
 
